@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order</title>
+  <link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
+  <script type="text/javascript" src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: #f0f0f0;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="table"></div>
+    <script>
+      const rawArray = {{ array | tojson }};
+    
+      console.log("Raw array:", rawArray);
+    
+      const array = rawArray.map(item => ({
+        order_id: item[0],
+        product_id: item[1],
+        product_name: item[2],
+        quantity: item[3],
+        order_date: item[4]
+      }));
+      
+    
+      console.log("Formatted array:", array);
+
+      
+    
+      var table = new Tabulator("#table", {
+        columnDefaults: { width: 250 },
+        data: array,
+        layout: "fitColumns",
+        columns: [
+          { title: "Order ID", field: "order_id" },
+          { title: "Product ID", field: "product_id" },
+          { title: "Product Name", field: "product_name" },
+          { title: "Quantity", field: "quantity" },
+          { title: "Order Date", field: "order_date" },
+          {
+            title: "Delete",
+            formatter: function(cell, formatterParams, onRendered) {
+              const data = cell.getRow().getData();
+              return `
+              <form action="/orders" method="post">
+                <input type="hidden" name="order_id" value="${data.order_id}">
+                <input type="submit" value="Delete">
+              </form>
+              `;
+            }
+          }
+        ]
+      });
+      
+    </script>
+  </div>
+</body>
+</html>
