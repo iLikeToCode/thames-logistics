@@ -6,15 +6,6 @@ app = Flask(__name__)
 
 prime_db(sqlite3.connect("thames.db"))
 
-@app.before_request
-def db_task():
-    conn = sqlite3.connect("thames.db")
-    cursor = conn.cursor()
-    cursor.execute("""
-        DELETE FROM products WHERE quantity = 0
-    """)
-    conn.commit()
-
 @app.get("/")
 def index():
     return render_template("index.html")
@@ -38,6 +29,29 @@ def order():
             return f"Ordered {request.form["amount"]} of {request.form["name"]}. {quantity-int(request.form["amount"])} remaining."
         else:
             print("Out of stock")
+
+@app.get("/stock")
+@app.post("/stock")
+def stock():
+    conn = sqlite3.connect("thames.db")
+    array = show(conn)
+    if request.method == "GET":
+        return render_template("stock.html", array=array)
+    elif request.method == "POST":
+        if request.form["type"] == "updateamount":
+            cursor = conn.cursor()
+            cursor.execute(f"SELECT (quantity) FROM products WHERE id = {request.form["id"]}")
+            conn.commit()
+            cursor.execute(f"UPDATE products SET quantity = {request.form["amount"]} WHERE id = {request.form["id"]}")
+            conn.commit()
+            return f"Set quantity of {request.form["name"]} to {request.form["amount"]}."
+        if request.form["type"] == "updateprice":
+            cursor = conn.cursor()
+            cursor.execute(f"SELECT (quantity) FROM products WHERE id = {request.form["id"]}")
+            cursor.execute(f"UPDATE products SET quantity = {request.form["price"]} WHERE id = {request.form["price"]}")
+            conn.commit()
+            conn.commit()
+            return f"Set price of {request.form["name"]} to {request.form["amount"]}."
             
             
 @app.get("/orders")
@@ -49,9 +63,12 @@ def orders():
         return render_template("orders.html", array=array)
     elif request.method == "POST":
         cursor = conn.cursor()
-        cursor.execute(f"DELETE FROM orders WHERE id = {request.form["order_id"]}")
+        order_ids = request.form.getlist("order_ids[]")
+        for order_id in order_ids:
+            cursor.execute(f"DELETE FROM orders WHERE id = ?", (order_id,))
         conn.commit()
-        return f"Deleted order {request.form['order_id']}"
+        return f"Deleted orders {', '.join(order_ids)}"
+
 
 if __name__ == "__main__":
     app.run(debug=True)

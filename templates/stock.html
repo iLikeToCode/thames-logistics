@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Order</title>
+  <title>Stock List</title>
   <link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
   <script type="text/javascript" src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
   <style>
@@ -19,6 +19,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      height: 100%;
       gap: 20px;
     }
   </style>
@@ -43,7 +44,7 @@
       
     
       var table = new Tabulator("#table", {
-        columnDefaults: {width: 250},
+        columnDefaults: {width: 200},
         data: array,
         layout: "fitColumns",
         columns: [
@@ -52,15 +53,47 @@
           { title: "Price (£)", field: "price" },
           { title: "Quantity", field: "quantity" },
           {
-            title: "Amount | Order",
+            title: "Quantity | Update",
+            width: 300,
             formatter: function(cell, formatterParams, onRendered) {
               const data = cell.getRow().getData();
               return `
-              <form action="/order" method="post">
+              <form action="/stock" method="post">
+                <input type="hidden" name="type" value="updateamount">
                 <input type="hidden" name="id" value="${data.id}">
                 <input type="hidden" name="name" value="${data.name}">
-                <input type="number" name="amount" value="1" min="1" max="${data.quantity}" style="width: 50px;">
-                <input type="submit" value="Order">
+                <input type="number" name="amount" value="${data.quantity}" min="0" style="width: 100px;">
+                <input type="submit" value="Update Quantity">
+              </form>
+              `;
+            }
+          },
+          {
+            title: "Price | Update",
+            width: 300,
+            formatter: function(cell, formatterParams, onRendered) {
+              const data = cell.getRow().getData();
+              return `
+              <form action="/stock" method="post">
+                <input type="hidden" name="type" value="updateprice">
+                <input type="hidden" name="id" value="${data.id}">
+                <input type="hidden" name="name" value="${data.name}">
+                £<input type="number" name="price" value="${data.price}" min="0" style="width: 100px;">
+                <input type="submit" value="Update Price">
+              </form>
+              `;
+            }
+          },
+          {
+            title: "Delete",
+            width: 100,
+            formatter: function(cell, formatterParams, onRendered) {
+              const data = cell.getRow().getData();
+              return `
+              <form action="/stock" method="post">
+                <input type="hidden" name="type" value="delete">
+                <input type="hidden" name="product_id" value="${data.product_id}">
+                <input type="submit" value="Delete">
               </form>
               `;
             }

@@ -10,7 +10,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      height: 100%;
       margin: 0;
       background: #f0f0f0;
     }
@@ -26,6 +26,7 @@
 <body>
   <div class="container">
     <div id="table"></div>
+    <button id="delete-selected">Delete Selected</button>
     <script>
       const rawArray = {{ array | tojson }};
     
@@ -39,16 +40,14 @@
         order_date: item[4]
       }));
       
-    
       console.log("Formatted array:", array);
 
-      
-    
       var table = new Tabulator("#table", {
         columnDefaults: { width: 250 },
         data: array,
         layout: "fitColumns",
         columns: [
+          { title: "Select", formatter: "rowSelection", titleFormatter: "rowSelection", hozAlign: "center", headerSort: false, cellClick: function(e, cell) { cell.getRow().toggleSelect(); } },
           { title: "Order ID", field: "order_id" },
           { title: "Product ID", field: "product_id" },
           { title: "Product Name", field: "product_name" },
@@ -68,7 +67,30 @@
           }
         ]
       });
-      
+
+      document.getElementById("delete-selected").addEventListener("click", function() {
+        const selectedData = table.getSelectedData();
+        const orderIds = selectedData.map(row => row.order_id);
+        
+        if (orderIds.length > 0) {
+          const form = document.createElement("form");
+          form.method = "post";
+          form.action = "/orders";
+          
+          orderIds.forEach(id => {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "order_ids[]";
+            input.value = id;
+            form.appendChild(input);
+          });
+          
+          document.body.appendChild(form);
+          form.submit();
+        } else {
+          alert("No orders selected");
+        }
+      });
     </script>
   </div>
 </body>
