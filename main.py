@@ -40,18 +40,15 @@ def stock():
     elif request.method == "POST":
         if request.form["type"] == "updateamount":
             cursor = conn.cursor()
-            cursor.execute(f"SELECT (quantity) FROM products WHERE id = {request.form["id"]}")
-            conn.commit()
             cursor.execute(f"UPDATE products SET quantity = {request.form["amount"]} WHERE id = {request.form["id"]}")
             conn.commit()
             return f"Set quantity of {request.form["name"]} to {request.form["amount"]}."
         if request.form["type"] == "updateprice":
             cursor = conn.cursor()
-            cursor.execute(f"SELECT (quantity) FROM products WHERE id = {request.form["id"]}")
-            cursor.execute(f"UPDATE products SET quantity = {request.form["price"]} WHERE id = {request.form["price"]}")
+            cursor.execute(f"UPDATE products SET price = {request.form["price"]} WHERE id = {request.form["id"]}")
             conn.commit()
             conn.commit()
-            return f"Set price of {request.form["name"]} to {request.form["amount"]}."
+            return f"Set price of {request.form["name"]} to {request.form["price"]}."
             
             
 @app.get("/orders")
