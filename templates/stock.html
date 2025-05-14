@@ -29,17 +29,29 @@
     <div id="table"></div>
     <script>
       const rawArray = {{ array | tojson }};
-    
+
       console.log("Raw array:", rawArray);
-    
+
       const array = rawArray.map(item => ({
         id: item[0],
         name: item[1],
         price: item[2],
         quantity: item[3]
       }));
-    
-      console.log("Formatted array:", array);
+
+      // Get max existing ID
+      const maxId = array.reduce((max, item) => item.id > max ? item.id : max, 0);
+
+      // Add an extra entry
+      array.push({
+        id: maxId + 1,
+        name: "Extra Item",
+        price: 0,
+        quantity: 1
+      });
+
+      console.log("Formatted array with extra entry:", array);
+
 
       
     
