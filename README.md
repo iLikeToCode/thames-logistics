@@ -1,1 +1,1 @@
-# "Thames" (Fake Company) Logistics Stock Control System
+# Logistics Stock Control System
