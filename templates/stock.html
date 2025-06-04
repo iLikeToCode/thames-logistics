@@ -76,12 +76,13 @@
             width: 300,
             formatter: function(cell, formatterParams, onRendered) {
               const data = cell.getRow().getData();
+              const priceValue = Number(data.price.replace('£', ''));
               return `
               <form action="/stock" method="post">
                 <input type="hidden" name="type" value="updateprice">
                 <input type="hidden" name="id" value="${data.id}">
                 <input type="hidden" name="name" value="${data.name}">
-                £<input type="number" name="price" value="${data.price}" min="0" step="0.01" style="width: 100px;">
+                £<input type="number" name="price" value="${priceValue}" min="0" step="0.01" style="width: 100px;">
                 <input type="submit" value="Update Price">
               </form>
               `;
