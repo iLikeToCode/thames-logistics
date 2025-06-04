@@ -27,37 +27,28 @@
 <body>
   <div class="container">
     <div id="table"></div>
+    <form action="/stock" method="post">
+      <input type="hidden" name="type" value="new">
+      <input type="text" name="name" placeholder="Product Name">
+      <input type="number" name="amount" min="0" placeholder="Quantity" style="width: 100px;">
+      <input type="number" name="price" min="0" placeholder="Price" style="width: 100px;">
+      <input type="submit" value="New Product">
+    </form>
     <script>
       const rawArray = {{ array | tojson }};
 
       console.log("Raw array:", rawArray);
 
-      const array = rawArray.map(item => ({
+      const tableArray = rawArray.map(item => ({
         id: item[0],
         name: item[1],
         price: item[2],
         quantity: item[3]
       }));
-
-      // Get max existing ID
-      const maxId = array.reduce((max, item) => item.id > max ? item.id : max, 0);
-
-      // Add an extra entry
-      array.push({
-        id: maxId + 1,
-        name: "Extra Item",
-        price: 0,
-        quantity: 1
-      });
-
-      console.log("Formatted array with extra entry:", array);
-
-
-      
     
       var table = new Tabulator("#table", {
         columnDefaults: {width: 200},
-        data: array,
+        data: tableArray,
         layout: "fitColumns",
         columns: [
           { title: "ID", field: "id" },
@@ -104,7 +95,7 @@
               return `
               <form action="/stock" method="post">
                 <input type="hidden" name="type" value="delete">
-                <input type="hidden" name="product_id" value="${data.product_id}">
+                <input type="hidden" name="id" value="${data.id}">
                 <input type="submit" value="Delete">
               </form>
               `;

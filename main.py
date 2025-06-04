@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from inventoryutils import *
 from waitress import serve
 import sqlite3
@@ -43,13 +43,19 @@ def stock():
             cursor = conn.cursor()
             cursor.execute(f"UPDATE products SET quantity = {request.form["amount"]} WHERE id = {request.form["id"]}")
             conn.commit()
-            return f"Set quantity of {request.form["name"]} to {request.form["amount"]}."
         if request.form["type"] == "updateprice":
             cursor = conn.cursor()
             cursor.execute(f"UPDATE products SET price = {request.form["price"]} WHERE id = {request.form["id"]}")
             conn.commit()
+        if request.form["type"] == "new":
+            cursor = conn.cursor()
+            cursor.execute(f"INSERT INTO products (name, price, quantity) VALUES ('{request.form["name"]}', {request.form["price"]}, {request.form["amount"]})")
             conn.commit()
-            return f"Set price of {request.form["name"]} to {request.form["price"]}."
+        if request.form["type"] == "delete":
+            cursor = conn.cursor()
+            cursor.execute(f"DELETE FROM products WHERE id = '{request.form["id"]}'")
+            conn.commit()
+        return redirect(url_for('stock'))
             
             
 @app.get("/orders")
@@ -63,7 +69,7 @@ def orders():
         cursor = conn.cursor()
         order_ids = request.form.getlist("order_ids[]")
         for order_id in order_ids:
-            cursor.execute(f"DELETE FROM orders WHERE id = ?", (order_id,))
+            cursor.execute(f"DELETE FROM orders WHERE id = {order_id}")
         conn.commit()
         return f"Deleted orders {', '.join(order_ids)}"
 
