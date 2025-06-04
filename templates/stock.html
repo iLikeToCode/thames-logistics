@@ -42,7 +42,7 @@
       const tableArray = rawArray.map(item => ({
         id: item[0],
         name: item[1],
-        price: Number(item[2]).toFixed(2),
+        price: "£" + Number(item[2]).toFixed(2),
         quantity: item[3]
       }));
     
